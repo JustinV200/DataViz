@@ -1,0 +1,11 @@
+---
+title: "Math230 Dashboard"
+author: "Alex Searle, Justin Verlin, Jean Marie Ngabonziza"
+output: flexdashboard::flex_dashboard
+date: "2025-04-08"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
