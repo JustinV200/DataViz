@@ -4,4 +4,4 @@
 
 Alex
 Justin
-Jean Marie 
+Jean Marie Ngabonziza
