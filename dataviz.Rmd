@@ -1,9 +1,10 @@
 ---
 title: "Math230 Dashboard"
 author: "Alex Searle, Justin Verlin, Jean Marie Ngabonziza"
-output: flexdashboard::flex_dashboard
+output: 
+  flexdashboard::flex_dashboard:
+    runtime: shiny
 date: "2025-04-08"
-runtime: shiny
 ---
 
 ```{r}
@@ -59,7 +60,59 @@ Column {.tabset}
 ### Chart 2
 
 ```{r}
+div(
+  style = "width: 30%;",
+sliderInput("n", "Sample Size (n):", min = 10, max = 1000, value = 100, step = 10)
+)
+```
+
+
+```{r, out.width="50%"}
+renderPlot({
+  set.seed(123)
+  
+  data <- get(input$dataset_choice, "package:Lock5Data")
+  
+  # Choose a variable depending on dataset
+  var <- switch(input$dataset_choice,
+                "BodyTemp50" = data$BodyTemp,
+                "CommuteAtlanta" = data$CommuteTime,
+                "SleepStudy" = data$ExtraSleep,
+                "StudentSurvey" = data$Height,
+                NULL)
+  
+  num_samples <- 1000
+  sample_size <- input$n
+  
+  # Simulate sampling distribution: take sample of size `sample_size` each time
+  sample_means <- NULL
+  for (i in 1:num_samples) {
+    sample_data <- sample(var, size = sample_size, replace = TRUE)
+    sample_means[i] <- mean(sample_data, na.rm = TRUE)
+  }
+
+
+  # Plot histogram
+  ggplot(data.frame(sample_means), aes(x = sample_means)) +
+    geom_histogram(bins = 50, fill = "#1f77b4", color = "white") +
+    geom_vline(xintercept = mean(sample_means), col = "#B53737", alpha = 0.8) +
+    labs(title = paste("Sampling Distribution of the Mean (n =", sample_size, ")"),
+         x = "Sample Mean", y = "Frequency") +
+    theme_minimal()
+  
+}, height = 300, width = 400)
+
 ```   
+
+```{r}
+renderPlot({
+   # QQ-Plot
+qqnorm(sample_means, plot.it = TRUE)
+qqline(sample_means, col = "#003865", lwd = 1)
+}, height = 300, width = 400)
+```
+
+
  
 ### Chart 3
     
