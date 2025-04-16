@@ -19,37 +19,35 @@ Column
     
 ```{r}
 fluidRow(
-  # Plot goes in the first row
-  column(12, plotOutput("histPlot", height = "300px"))
-)
-
-fluidRow(
   column(12, selectInput("dataset_choice", "Select a dataset:",
-                         choices = c("BodyTemp50", "CommuteAtlanta", "SleepStudy", "StudentSurvey"),
+                         choices = c("BodyTemp50", "Cereal", "BaseballSalaries2019", "StudentSurvey"),
                          selected = "BodyTemp50"))
 )
 
-renderPlot({
-  data <- get(input$dataset_choice, "package:Lock5Data")
-  
-  # Use a default numeric column (example: BodyTemp from BodyTemp50)
+fluidRow(
+  column(12, plotOutput("histPlot", height = "300px"))
+)
+
+# Server logic
+output$histPlot <- renderPlot({
+  data <- get(input$dataset_choice, envir = as.environment("package:Lock5Data"))
+
+  # Choose a valid numeric column depending on dataset
   var <- switch(input$dataset_choice,
                 "BodyTemp50" = data$BodyTemp,
-                "CommuteAtlanta" = data$CommuteTime,
-                "SleepStudy" = data$ExtraSleep,
-                "StudentSurvey" = data$Height,  # adjust as needed
+                "Cereal" = data$Sugars,
+                "BaseballSalaries2019" = data$Salary,
+                "StudentSurvey" = data$Height,
                 NULL)
-  
+
   ggplot(data.frame(x = var), aes(x = x)) +
-    geom_histogram(binwidth = .25, fill = "navyblue", color = "white") +
+    geom_histogram(binwidth = 0.25, fill = "navyblue", color = "white") +
     geom_vline(aes(xintercept = mean(x, na.rm = TRUE)), 
                color = "red", linetype = "dashed", linewidth = 1) +
     labs(title = paste("Population Histogram of", input$dataset_choice),
          x = "Value", y = "Frequency") +
     theme_minimal()
 }, height = 300, width = 500)
-
-
 
 ```
    
