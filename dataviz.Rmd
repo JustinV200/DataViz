@@ -15,10 +15,10 @@ library(ggplot2)
 Column 
 -------------------------------------
     
-### Chart 1
+### Population Graph
     
 ```{r}
-ui <- fluidPage(
+ui = fluidPage(
   fluidRow(
     column(12, selectInput("dataset_choice", "Select a dataset:",
                            choices = c("BodyTemp50", "Cereal", "BaseballSalaries2019", "StudentSurvey", 
@@ -33,14 +33,12 @@ ui <- fluidPage(
   )
 )
 
-server <- function(input, output, session) {
-  # Generate distributions only once
-  normdist <- rnorm(10000, mean = 0, sd = 1)
-  expdist <- rexp(10000, rate = 1)
-  binomdist <- rbinom(10000, size = 100, prob = 0.75)
+server = function(input, output, session) {
+  normdist = rnorm(100000, mean = 10, sd = 1)
+  expdist = rexp(10000, rate = 1)
+  binomdist = rbinom(10000, size = 10000, prob = 0.75)
 
-  output$histPlot <- renderPlot({
-    # Load data or use generated distributions
+  output$histPlot = renderPlot({
     var = switch(input$dataset_choice,
                   "BodyTemp50" = BodyTemp50$BodyTemp,
                   "Cereal" = Cereal$Sugars,
@@ -52,7 +50,7 @@ server <- function(input, output, session) {
                   NULL)
 
     ggplot(data.frame(x = var), aes(x = x)) +
-      geom_histogram(binwidth = 0.25, fill = "navyblue", color = "white") +
+      geom_histogram(binwidth = (2 * IQR(na.omit(var)) / (length(na.omit(var))^(1/3))), fill = "navyblue", color = "white") +
       geom_vline(aes(xintercept = mean(x, na.rm = TRUE)), 
                  color = "red", linetype = "dashed", linewidth = 2) +
       labs(title = paste("Population Histogram of", input$dataset_choice),
@@ -60,7 +58,7 @@ server <- function(input, output, session) {
       theme_minimal()
   }, height = 300, width = 500)
   output$meanText <- renderPrint({
-  var <- switch(input$dataset_choice,
+  var = switch(input$dataset_choice,
                 "BodyTemp50" = BodyTemp50$BodyTemp,
                 "Cereal" = Cereal$Sugars,
                 "BaseballSalaries2019" = BaseballSalaries2019$Salary,
