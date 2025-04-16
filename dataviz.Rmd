@@ -39,7 +39,7 @@ server = function(input, output, session) {
   binomdist = rbinom(10000, size = 10000, prob = 0.75)
 
   output$histPlot = renderPlot({
-    var = switch(input$dataset_choice,
+    var = na.omit(switch(input$dataset_choice,
                   "BodyTemp50" = BodyTemp50$BodyTemp,
                   "Cereal" = Cereal$Sugars,
                   "BaseballSalaries2019" = BaseballSalaries2019$Salary,
@@ -47,7 +47,7 @@ server = function(input, output, session) {
                   "Normal Distribution" = normdist,
                   "Exponential Distribution" = expdist,
                   "Binomial Distribution" = binomdist,
-                  NULL)
+                  NULL))
 
     ggplot(data.frame(x = na.omit(var)), aes(x = x)) +
       geom_histogram(binwidth = (2 * IQR(na.omit(var)) / (length(na.omit(var))^(1/3))), fill = "navyblue", color = "white") +
