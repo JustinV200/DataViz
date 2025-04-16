@@ -49,7 +49,7 @@ server = function(input, output, session) {
                   "Binomial Distribution" = binomdist,
                   NULL)
 
-    ggplot(data.frame(x = var), aes(x = x)) +
+    ggplot(data.frame(x = na.omit(var)), aes(x = x)) +
       geom_histogram(binwidth = (2 * IQR(na.omit(var)) / (length(na.omit(var))^(1/3))), fill = "navyblue", color = "white") +
       geom_vline(aes(xintercept = mean(x, na.rm = TRUE)), 
                  color = "red", linetype = "dashed", linewidth = 2) +
@@ -58,7 +58,7 @@ server = function(input, output, session) {
       theme_minimal()
   }, height = 300, width = 500)
   output$meanText <- renderPrint({
-  var = switch(input$dataset_choice,
+  var = na.omit(switch(input$dataset_choice,
                 "BodyTemp50" = BodyTemp50$BodyTemp,
                 "Cereal" = Cereal$Sugars,
                 "BaseballSalaries2019" = BaseballSalaries2019$Salary,
@@ -66,7 +66,7 @@ server = function(input, output, session) {
                 "Normal Distribution" = normdist,
                 "Exponential Distribution" = expdist,
                 "Binomial Distribution" = binomdist,
-                NULL)
+                NULL))
   
   cat("Mean:", round(mean(var, na.rm = TRUE), 4))
 })
