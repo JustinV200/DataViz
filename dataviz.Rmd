@@ -85,7 +85,50 @@ Column {.tabset}
 ```{r}
 ```   
  
-### Chart 3
+### Build a Distribution
     
 ```{r}
+fluidRow(
+  column(5,
+  sliderInput("numSamples", "Choose Number of Samples",
+              min = 1, max = 1000, value = 20),
+  actionButton("Addsamples", "Add A Sample(s)")
+  ),
+  column(5,
+         sliderInput("sampleSize", "Choose the Sample Size", 
+                     min = 10, max = 500, value = 15))
+)
+
+renderPlot({
+  data <- get(input$dataset_choice, "package:Lock5Data")
+  
+   var <- switch(input$dataset_choice,
+                "BodyTemp50" = data$BodyTemp,
+                "CommuteAtlanta" = data$CommuteTime,
+                "SleepStudy" = data$ExtraSleep,
+                "StudentSurvey" = data$Height,  # adjust as needed
+                NULL)
+   var = na.omit(var)
+   sample_means = NULL
+   for(i in 1:input$numSamples){
+     samp = sample(var, input$sampleSize)
+     sample_means[i] = mean(samp)
+   }
+   
+   bin.width = max(sample_means) - min(sample_means)
+   ggplot() +
+     geom_dotplot(aes(x = sample_means, y = after_stat(count)), fill = "#003865", binwidth = bin.width / 100) +
+     geom_vline(aes(xintercept = mean(var), color = "Population"), linetype = "dashed", color = "red3", 
+                alpha = 0.5, size = 1.5) +
+     geom_vline(aes(xintercept = mean(sample_means), color = "Sample"), linetype = "dashed", 
+                color = "#E87722", alpha = 0.5, size = 1.5) +
+     annotate(x = mean(var) - bin.width / 8, y = +Inf, label = "Population Mean", vjust = 2,
+              geom = "label", color = "red3") +
+     annotate(x = mean(sample_means) + bin.width / 8, y = +Inf, label = "Sample Mean", vjust = 2,
+              geom = "label", color = "#E87722") +
+     xlab("Sample Means") +
+     ylab("") +
+     ggtitle("Build You Own Sampling Distribution!")
+     
+}, height = 400, width = 500) |> bindEvent(input$Addsamples)
 ```
