@@ -274,15 +274,15 @@ output$buildPlot <- renderPlot({
 # Value Box
 
 output$miniValueBox <- renderUI({
-  value <- round(mean(selected_var(), na.rm = TRUE), 2)
+  value <- round(mean(sample_means(), na.rm = TRUE), 2)
   
-  div(style = "background-color: #003865; color: white; 
+  div(style = "background-color: lightgrey; color: black; 
                width: 100px; height: 80px; 
-               padding-top: 10px; border-radius: 8px; 
+               padding: 10px; border-radius: 4px; 
                text-align: center; font-size: 14px;
-               margin-left: 350px;
-               margin-top: 25px",
-      strong("Mean"),
+               margin-left: 250px;
+               margin-top: 40px",
+      strong("Sample Mean:"),
       br(),
       span(value)
   )
