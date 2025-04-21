@@ -222,7 +222,7 @@ output$qqPlot <- renderPlot({
 sample_means_accum <- reactiveVal(numeric())
 
 observeEvent(input$sampleSize, {
-  sample_means_accum = reactiveVal(numeric())
+  sample_means_accum(numeric())
 })
 
 observeEvent(input$Addsamples, {
