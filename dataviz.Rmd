@@ -29,6 +29,18 @@ ui = fluidPage(
     column(12, plotOutput("histPlot", height = "300px"))
   ),
     fluidRow(
+    column(12,
+           HTML("<p><strong>What is a Population Graph?</strong><br>
+           A population graph, such as a histogram, shows how values in an entire dataset are distributed. It groups values into intervals (called bins) 
+           and displays how frequently values occur within each bin. This helps us understand patterns in the data like the center, spread, and shape.</p>
+           
+           <p><strong>What is a Distribution?</strong><br>
+           A distribution describes the overall pattern of how values are spread out in a dataset. It helps us see where values cluster, how much they vary, 
+           and whether the shape is symmetric, skewed, or uniform.</p>")
+    )
+  ),
+
+    fluidRow(
     column(12, verbatimTextOutput("meanText")) 
   )
 )
@@ -83,6 +95,7 @@ Column {.tabset}
 ### Chart 2
 
 ```{r}
+
 ```   
  
 ### Chart 3
