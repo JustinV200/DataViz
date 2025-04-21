@@ -19,7 +19,7 @@ library(flexdashboard)
 Column
 -------------------------------------
     
-### Chart 1
+### Population Distribution
 
 ```{r}
 # UI elements: dataset selector and histogram
@@ -50,26 +50,28 @@ fluidRow(
 Column {.tabset}
 -------------------------------------
    
-### Chart 2
+### Sampling Distribution
 
 ```{r}
 fluidPage(
 fluidRow(
   column(width = 4,
-         # Slider at the top
          sliderInput("n", "Sample Size (n):", min = 10, max = 1000, value = 10, step = 20),
          
-         # Sampling distribution plot below slider
-         plotOutput("sampleDistPlot", height = "250px"),
+         # Horizontal row: histogram and mini value box
+         fluidRow(
+           column(width = 9,
+                  plotOutput("sampleDistPlot", height = "250px")
+           ),
+           column(width = 3,
+                  uiOutput("miniValueBox")
+           )
+         ),
          
-         # ValueBox next to sampling distribution
-         #div(style = "height: 100px; width: 150px;",
-           #valueBoxOutput("valueBox")),
-        
-         # QQ plot below sampling distribution
          plotOutput("qqPlot", height = "250px")
   )
 ),
+
 
 fluidPage(
 
@@ -97,7 +99,7 @@ fluidPage(
 ```
 
 
-### Chart 3
+### Building Samples
 
 ```{r}
 fluidPage(
@@ -260,6 +262,25 @@ output$buildPlot <- renderPlot({
     xlab("Sample Means") + ylab("") + ggtitle("Build Your Own Sampling Distribution") +
     theme_minimal()
 })
+
+
+# Value Box
+
+output$miniValueBox <- renderUI({
+  value <- round(mean(selected_var(), na.rm = TRUE), 2)
+  
+  div(style = "background-color: #003865; color: white; 
+               width: 100px; height: 80px; 
+               padding-top: 10px; border-radius: 8px; 
+               text-align: center; font-size: 14px;
+               margin-left: 350px;
+               margin-top: 25px",
+      strong("Mean"),
+      br(),
+      span(value)
+  )
+})
+
 ```
 
 
