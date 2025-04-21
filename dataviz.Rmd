@@ -3,9 +3,9 @@ title: "Math230 Dashboard"
 author: "Alex Searle, Justin Verlin, Jean Marie Ngabonziza"
 output: 
   flexdashboard::flex_dashboard:
-    runtime: shiny
     orientation: columns
     vertical_layout: fill
+runtime: shiny
 ---
 
 ```{r}
@@ -37,7 +37,9 @@ fluidRow(
               
               <p><strong>What is a Distribution?</strong><br>
               A distribution describes the overall pattern of how values are spread out in a dataset. It helps us see where values cluster, how much they vary, 
-              and whether the shape is symmetric, skewed, or uniform.</p>"),
+              and whether the shape is symmetric, skewed, or uniform.</p>
+              
+              <p> Often times, obtaining meaningful information from the population is not possible. Which is why we use methods like Sampling Distribution. </p>"),
          
          verbatimTextOutput("meanText")
   )
@@ -85,7 +87,7 @@ fluidPage(
            p("As the sample size increases, the sampling distribution becomes more concentrated around the population mean and more closely approximates a normal distribution (as per the Central Limit Theorem)."),
            p("The QQ plot provides a visual assessment of normality for the sampling distribution of the mean."),
            
-           h3("What is a QQ-Plot?"),
+           h3("What is a Q-Q Plot?"),
            p("A Quantile-Quantile (Q-Q) plot is used to check if a dataset follows a theoretical distribution — usually the normal distribution."),
            p("Each point on the plot compares a quantile from your sample data with the corresponding quantile from a normal distribution."),
            p("If the sample data is approximately normal, the points will fall roughly along the straight diagonal line."),
