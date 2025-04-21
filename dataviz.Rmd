@@ -99,12 +99,12 @@ fluidPage(
 ```
 
 
-### Building Samples
+### Build a Distribution
 
 ```{r}
 fluidPage(
   fluidRow(
-    column(width = 4,
+    column(width = 12,
            sliderInput("sampleSize", "Sample Size:", min = 5, max = 1000, value = 30, step = 5),
            sliderInput("numSamples", "Number of Samples to Add:", min = 1, max = 100, value = 10),
            actionButton("Addsamples", "Add Samples"),
@@ -112,7 +112,8 @@ fluidPage(
            br(),
            plotOutput("buildPlot", height = "300px")
     ),
-    
+  ),
+  fluidRow(
     column(width = 8,
            div(
              style = "padding: 20px",
