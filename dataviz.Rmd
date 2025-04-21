@@ -119,7 +119,8 @@ fluidPage(
              style = "padding: 20px",
              h3("Build Your Own Sampling Distribution"),
              p("This interactive tool allows you to simulate drawing multiple samples from a population."),
-             p("Each time you click 'Add Samples', the app draws new random samples, computes their means, and adds them to the existing plot."),
+             p("Each time you click 'Add Samples', the app draws new random samples, computes the means of the samples, and adds them to the existing plot"),
+             p("Each dot you see is a MEAN of one of the samples that you drew, the samples that you drew does not get plotted only it's MEAN does!!"),
              p("Over time, you'll see the distribution of sample means taking shape!"),
              p("The red dashed line shows the population mean, while the orange line shows the mean of your sampled data.")
            )
