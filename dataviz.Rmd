@@ -201,7 +201,7 @@ output$sampleDistPlot <- renderPlot({
     labs(title = paste("Sampling Distribution of the Mean (n =", input$n, ")"),
          x = "Sample Mean", y = "Frequency") +
     theme_minimal()
-}, height = 200, width = 400)
+}, height = 300, width = 400)
 
 # Value Box showing population mean
 output$valueBox <- renderValueBox({
@@ -219,7 +219,7 @@ output$qqPlot <- renderPlot({
   
   qqnorm(sm, main = "QQ-Plot of Sample Means")
   qqline(sm, col = "#003865", lwd = 2)
-}, height = 200, width = 400)
+}, height = 300, width = 400)
 
 
 
