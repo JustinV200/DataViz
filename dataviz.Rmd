@@ -221,8 +221,12 @@ output$qqPlot <- renderPlot({
 # Reactive value to accumulate sample means
 sample_means_accum <- reactiveVal(numeric())
 
+observeEvent(input$sampleSize, {
+  sample_means_accum = reactiveVal(numeric())
+})
+
 observeEvent(input$Addsamples, {
-  data <- switch(input$dataset_choice,
+  data = switch(input$dataset_choice,
                  "BodyTemp50" = BodyTemp50$BodyTemp,
                  "StudentSurvey" = StudentSurvey$Height,
                  "Cereal" = Cereal$Sugars,
@@ -231,9 +235,13 @@ observeEvent(input$Addsamples, {
                  "Exponential Distribution" = expdist,
                  "Binomial Distribution" = binomdist,
                  NULL)
-  data <- na.omit(data)
+  data = na.omit(data)
   
-  new_means <- replicate(input$numSamples, mean(sample(data, input$sampleSize, replace = TRUE)))
+  new_means = NULL
+  for(i in 1:input$numSamples){
+  samp = sample(data, input$sampleSize, replace = FALSE)
+  new_means[i] = mean(samp)
+  }
   sample_means_accum(c(sample_means_accum(), new_means))
 })
 
