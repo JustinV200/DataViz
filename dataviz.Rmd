@@ -272,7 +272,6 @@ output$buildPlot <- renderPlot({
 
 
 # Value Box
-
 output$miniValueBox <- renderUI({
   value <- round(mean(sample_means(), na.rm = TRUE), 2)
   
