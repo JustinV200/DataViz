@@ -12,6 +12,8 @@ output:
 library(shiny)
 library(ggplot2)
 library(Lock5Data)
+library(flexdashboard)
+
 ```
 
 Column
@@ -20,15 +22,28 @@ Column
 ### Chart 1
 
 ```{r}
-# Dataset selector
-selectInput("dataset_choice", "Select a dataset:",
-  choices = c("BodyTemp50", "CommuteAtlanta", "SleepStudy", "StudentSurvey"),
-  selected = "BodyTemp50"
+# UI elements: dataset selector and histogram
+fluidRow(
+  column(width = 12,
+         selectInput("dataset_choice", "Select a dataset:",
+                     choices = c("BodyTemp50", "Cereal", "BaseballSalaries2019", "StudentSurvey", 
+                                 "Normal Distribution", "Exponential Distribution", "Binomial Distribution"),
+                     selected = "BodyTemp50"),
+         plotOutput("popPlot", height = "300px"),
+         
+         HTML("<p><strong>What is a Population Graph?</strong><br>
+              A population graph, such as a histogram, shows how values in an entire dataset are distributed. It groups values into intervals (called bins) 
+              and displays how frequently values occur within each bin. This helps us understand patterns in the data like the center, spread, and shape.</p>
+              
+              <p><strong>What is a Distribution?</strong><br>
+              A distribution describes the overall pattern of how values are spread out in a dataset. It helps us see where values cluster, how much they vary, 
+              and whether the shape is symmetric, skewed, or uniform.</p>"),
+         
+         verbatimTextOutput("meanText")
+  )
 )
-# Population histogram
-plotOutput("popPlot", height = "100")
 
-shinyApp(ui, server)
+
 ```
 
 
@@ -38,126 +53,126 @@ Column {.tabset}
 ### Chart 2
 
 ```{r}
-# Sample size slider
+fluidPage(
 fluidRow(
-  column(
-    4,
-    sliderInput("n", "Sample Size (n):", min = 10, max = 1000, value = 10, step = 20),
-    plotOutput("sampleDistPlot", height = "300px"), # Adjust height as needed
-
-    plotOutput("qqPlot", height = "300px", width = "100%") # Use width = "100%" to adapt to parent container
+  column(width = 4,
+         # Slider at the top
+         sliderInput("n", "Sample Size (n):", min = 10, max = 1000, value = 10, step = 20),
+         
+         # Sampling distribution plot below slider
+         plotOutput("sampleDistPlot", height = "250px"),
+         
+         # ValueBox next to sampling distribution
+         #div(style = "height: 100px; width: 150px;",
+           #valueBoxOutput("valueBox")),
+        
+         # QQ plot below sampling distribution
+         plotOutput("qqPlot", height = "250px")
   )
-)
-```   
- 
-### Build a Distribution
-    
-```{r}
-fluidRow(
-  column(
-    5,
-    sliderInput("numSamples", "Choose Number of Samples",
-      min = 1, max = 1000, value = 20
-    ),
-    actionButton("Addsamples", "Add A Sample(s)")
-  ),
-  column(
-    5,
-    sliderInput("sampleSize", "Choose the Sample Size",
-      min = 10, max = 500, value = 15
-    )
+),
+
+fluidPage(
+
+  # Text information to the right
+  column(width = 8,
+         div(
+           style = "padding: 20px; padding-bottom: 30px",
+           h3("What is Sampling Distribution?"),
+           p("This is the distribution of a statistic calculated from all possible samples of the same size from the population."),
+           p("Each sample gives a slightly different result due to randomness in the sample selection."),
+           p("As the sample size increases, the sampling distribution becomes more concentrated around the population mean and more closely approximates a normal distribution (as per the Central Limit Theorem)."),
+           p("The QQ plot provides a visual assessment of normality for the sampling distribution of the mean."),
+           
+           h3("What is a QQ-Plot?"),
+           p("A Quantile-Quantile (Q-Q) plot is used to check if a dataset follows a theoretical distribution — usually the normal distribution."),
+           p("Each point on the plot compares a quantile from your sample data with the corresponding quantile from a normal distribution."),
+           p("If the sample data is approximately normal, the points will fall roughly along the straight diagonal line."),
+           p("Deviations from the line (especially at the ends) suggest the data may not be normally distributed."),
+           p("Q-Q plots are especially useful when checking the shape of a distribution, or validating the assumptions needed for certain statistical tests.")
+         )
+         
   )
-)
+))
 
-renderPlot(
-  {
-    data <- get(input$dataset_choice, "package:Lock5Data")
-
-    var <- switch(input$dataset_choice,
-      "BodyTemp50" = data$BodyTemp,
-      "CommuteAtlanta" = data$CommuteTime,
-      "SleepStudy" = data$ExtraSleep,
-      "StudentSurvey" = data$Height, # adjust as needed
-      NULL
-    )
-    var <- na.omit(var)
-    sample_means <- NULL
-    for (i in 1:input$numSamples) {
-      samp <- sample(var, input$sampleSize)
-      sample_means[i] <- mean(samp)
-    }
-
-    bin.width <- max(sample_means) - min(sample_means)
-    ggplot() +
-      geom_dotplot(aes(x = sample_means, y = after_stat(count)), fill = "#003865", binwidth = bin.width / 100) +
-      geom_vline(aes(xintercept = mean(var), color = "Population"),
-        linetype = "dashed", color = "red3",
-        alpha = 0.5, size = 1.5
-      ) +
-      geom_vline(aes(xintercept = mean(sample_means), color = "Sample"),
-        linetype = "dashed",
-        color = "#E87722", alpha = 0.5, size = 1.5
-      ) +
-      annotate(
-        x = mean(var) - bin.width / 8, y = +Inf, label = "Population Mean", vjust = 2,
-        geom = "label", color = "red3"
-      ) +
-      annotate(
-        x = mean(sample_means) + bin.width / 8, y = +Inf, label = "Sample Mean", vjust = 2,
-        geom = "label", color = "#E87722"
-      ) +
-      xlab("Sample Means") +
-      ylab("") +
-      ggtitle("Build You Own Sampling Distribution!")
-  },
-  height = 400,
-  width = 500
-) |> bindEvent(input$Addsamples)
 ```
 
+
+### Chart 3
+
+```{r}
+fluidPage(
+  fluidRow(
+    column(width = 4,
+           sliderInput("sampleSize", "Sample Size:", min = 5, max = 1000, value = 30, step = 5),
+           sliderInput("numSamples", "Number of Samples to Add:", min = 1, max = 100, value = 10),
+           actionButton("Addsamples", "Add Samples"),
+           br(),
+           br(),
+           plotOutput("buildPlot", height = "300px")
+    ),
+    
+    column(width = 8,
+           div(
+             style = "padding: 20px",
+             h3("Build Your Own Sampling Distribution"),
+             p("This interactive tool allows you to simulate drawing multiple samples from a population."),
+             p("Each time you click 'Add Samples', the app draws new random samples, computes their means, and adds them to the existing plot."),
+             p("Over time, you'll see the distribution of sample means taking shape!"),
+             p("The red dashed line shows the population mean, while the orange line shows the mean of your sampled data.")
+           )
+    )
+  )
+)
+
+```
 
 
 ```{r}
 # Server logic
 
-# Reactive for selected dataset's numeric variable
-selected_var <- reactive({
-  data <- get(input$dataset_choice, "package:Lock5Data")
+# Create simulated datasets
+normdist <- rnorm(100000, mean = 10, sd = 1)
+expdist <- rexp(10000, rate = 1)
+binomdist <- rbinom(10000, size = 10000, prob = 0.75)
 
+# Reactive expression for selected dataset variable
+selected_var <- reactive({
   switch(input$dataset_choice,
-    "BodyTemp50" = data$BodyTemp,
-    "CommuteAtlanta" = data$CommuteTime,
-    "SleepStudy" = data$ExtraSleep,
-    "StudentSurvey" = data$Height,
-    NULL
-  )
+         "BodyTemp50" = BodyTemp50$BodyTemp,
+         "Cereal" = Cereal$Sugars,
+         "BaseballSalaries2019" = BaseballSalaries2019$Salary,
+         "StudentSurvey" = StudentSurvey$Height,
+         "Normal Distribution" = normdist,
+         "Exponential Distribution" = expdist,
+         "Binomial Distribution" = binomdist,
+         NULL)
 })
 
-# Population plot
-output$popPlot <- renderPlot(
-  {
-    var <- selected_var()
-    ggplot(data.frame(x = var), aes(x = x)) +
-      geom_histogram(binwidth = 0.25, fill = "#1f77b4", color = "white") +
-      geom_vline(aes(xintercept = mean(x, na.rm = TRUE)),
-        color = "red", linetype = "dashed", linewidth = 1
-      ) +
-      labs(
-        title = paste("Population Histogram of", input$dataset_choice),
-        x = "Value", y = "Frequency"
-      ) +
-      theme_minimal()
-  },
-  height = 300,
-  width = 400
-)
+# Updated population plot
+output$popPlot <- renderPlot({
+  var <- na.omit(selected_var())
+  ggplot(data.frame(x = var), aes(x = x)) +
+    geom_histogram(binwidth = (2 * IQR(var) / (length(var)^(1/3))),
+                   fill = "navyblue", color = "white") +
+    geom_vline(aes(xintercept = mean(var, na.rm = TRUE)), 
+               color = "red", linetype = "dashed", linewidth = 2) +
+    labs(title = paste("Population Histogram of", input$dataset_choice),
+         x = "Value", y = "Frequency") +
+    theme_minimal()
+}, height = 300, width = 500)
+
+# Mean display
+output$meanText <- renderPrint({
+  var <- na.omit(selected_var())
+  cat("Mean:", round(mean(var), 4))
+})
 
 # Sample means reactive
 sample_means <- reactive({
   var <- selected_var()
   num_samples <- 1000
   sample_size <- input$n
-
+  
   sm <- numeric(num_samples)
   for (i in 1:num_samples) {
     sample_data <- sample(var, size = sample_size, replace = TRUE)
@@ -167,33 +182,84 @@ sample_means <- reactive({
 })
 
 # Sampling distribution plot
-output$sampleDistPlot <- renderPlot(
-  {
-    sm <- sample_means()
-    ggplot(data.frame(sm = sm), aes(x = sm)) +
-      geom_histogram(bins = 30, fill = "#EE7623", color = "white") +
-      geom_vline(xintercept = mean(sm), col = "black", linewidth = 0.8) +
-      labs(
-        title = paste("Sampling Distribution of the Mean (n =", input$n, ")"),
-        x = "Sample Mean", y = "Frequency"
-      ) +
-      theme_minimal()
-  },
-  height = 300,
-  width = 400
-)
+output$sampleDistPlot <- renderPlot({
+  sm <- sample_means()
+  ggplot(data.frame(sm = sm), aes(x = sm)) +
+    geom_histogram(bins = 30, fill = "#EE7623", color = "white") +
+    geom_vline(xintercept = mean(sm), col = "black") +
+    geom_vline(xintercept = mean(selected_var()), col = "blue") +
+    labs(title = paste("Sampling Distribution of the Mean (n =", input$n, ")"),
+         x = "Sample Mean", y = "Frequency") +
+    theme_minimal()
+}, height = 200, width = 400)
+
+# Value Box showing population mean
+output$valueBox <- renderValueBox({
+  valueBox(
+      value = round(mean(selected_var(), na.rm = TRUE), 2),
+      caption = "Population Mean",
+      icon = "fa-chart-line",
+      color = "#003865"
+  )
+})
 
 # QQ plot of sample means
-output$qqPlot <- renderPlot(
-  {
-    sm <- sample_means() # get the vector of sample means
+output$qqPlot <- renderPlot({
+  sm <- sample_means()  # get the vector of sample means
+  
+  qqnorm(sm, main = "QQ-Plot of Sample Means")
+  qqline(sm, col = "#003865", lwd = 2)
+}, height = 200, width = 400)
 
-    qqnorm(sm, main = "QQ-Plot of Sample Means")
-    qqline(sm, col = "#003865", lwd = 2)
-  },
-  height = 300,
-  width = 400
-)
+
+
+## CHART 3
+
+# Reactive value to accumulate sample means
+sample_means_accum <- reactiveVal(numeric())
+
+observeEvent(input$Addsamples, {
+  data <- switch(input$dataset_choice,
+                 "BodyTemp50" = BodyTemp50$BodyTemp,
+                 "StudentSurvey" = StudentSurvey$Height,
+                 "Cereal" = Cereal$Sugars,
+                 "BaseballSalaries2019" = BaseballSalaries2019$Salary,
+                 "Normal Distribution" = normdist,
+                 "Exponential Distribution" = expdist,
+                 "Binomial Distribution" = binomdist,
+                 NULL)
+  data <- na.omit(data)
+  
+  new_means <- replicate(input$numSamples, mean(sample(data, input$sampleSize, replace = TRUE)))
+  sample_means_accum(c(sample_means_accum(), new_means))
+})
+
+output$buildPlot <- renderPlot({
+  sample_means <- sample_means_accum()
+  if (length(sample_means) == 0) return(NULL)
+  
+  data <- switch(input$dataset_choice,
+                 "BodyTemp50" = BodyTemp50$BodyTemp,
+                 "StudentSurvey" = StudentSurvey$Height,
+                 "Cereal" = Cereal$Sugars,
+                 "BaseballSalaries2019" = BaseballSalaries2019$Salary,
+                 "Normal Distribution" = normdist,
+                 "Exponential Distribution" = expdist,
+                 "Binomial Distribution" = binomdist,
+                 NULL)
+  data <- na.omit(data)
+  
+  bin.width = max(sample_means) - min(sample_means)
+  
+  ggplot() +
+    geom_dotplot(aes(x = sample_means, y = after_stat(count)), fill = "#003865", binwidth = bin.width / 100) +
+    geom_vline(aes(xintercept = mean(data)), color = "red3", linetype = "dashed", size = 1.5, alpha = 0.5) +
+    geom_vline(aes(xintercept = mean(sample_means)), color = "#E87722", linetype = "dashed", size = 1.5, alpha = 0.5) +
+    annotate("label", x = mean(data) - bin.width / 8, y = Inf, label = "Population Mean", vjust = 2, color = "red3") +
+    annotate("label", x = mean(sample_means) + bin.width / 8, y = Inf, label = "Sample Mean", vjust = 2, color = "#E87722") +
+    xlab("Sample Means") + ylab("") + ggtitle("Build Your Own Sampling Distribution") +
+    theme_minimal()
+})
 ```
 
 
