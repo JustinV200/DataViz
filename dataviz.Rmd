@@ -152,6 +152,12 @@ selected_var <- reactive({
          NULL)
 })
 
+observeEvent(input$dataset_choice, {
+  var = na.omit(selected_var())
+  max_val = length(var)
+  updateSliderInput(session, "sampleSize", min = 5, max = min(1000, max_val), value = min(30, max_val))
+})
+
 # Updated population plot
 output$popPlot <- renderPlot({
   var <- na.omit(selected_var())
