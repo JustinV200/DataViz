@@ -26,9 +26,9 @@ Column
 fluidRow(
   column(width = 12,
          selectInput("dataset_choice", "Select a dataset:",
-                     choices = c("BodyTemp50", "Cereal", "BaseballSalaries2019", "StudentSurvey", 
+                     choices = c("Cereal", "BaseballSalaries2019", "StudentSurvey", 
                                  "Normal Distribution", "Exponential Distribution", "Binomial Distribution"),
-                     selected = "BodyTemp50"),
+                     selected = "Normal Distribution"),
          plotOutput("popPlot", height = "300px"),
          
          HTML("<p><strong>What is a Population Graph?</strong><br>
@@ -227,7 +227,6 @@ observeEvent(input$sampleSize, {
 
 observeEvent(input$Addsamples, {
   data = switch(input$dataset_choice,
-                 "BodyTemp50" = BodyTemp50$BodyTemp,
                  "StudentSurvey" = StudentSurvey$Height,
                  "Cereal" = Cereal$Sugars,
                  "BaseballSalaries2019" = BaseballSalaries2019$Salary,
@@ -250,7 +249,6 @@ output$buildPlot <- renderPlot({
   if (length(sample_means) == 0) return(NULL)
   
   data <- switch(input$dataset_choice,
-                 "BodyTemp50" = BodyTemp50$BodyTemp,
                  "StudentSurvey" = StudentSurvey$Height,
                  "Cereal" = Cereal$Sugars,
                  "BaseballSalaries2019" = BaseballSalaries2019$Salary,
